@@ -23,7 +23,7 @@ try {
     //$test->testAddUser();
     //$test->testAddItem();
     //$test->testAddConsumption();
-    $test->testGetRecommendations();
+    //$test->testGetRecommendations();
     //$test->testGetSimilar();
     //$test->testDeleteRecommendation();
     //$test->testGetAnalytics();
@@ -107,7 +107,7 @@ class SugestioClientTest {
 
         //$recommendations = $this->client->getRecommendations(1, array('category' => 'music'));
         //$recommendations = $this->client->getRecommendations(1, array('segment' => 'en-US'));
-        $recommendations = $this->client->getRecommendations(5);
+        $recommendations = $this->client->getRecommendations(1);
 
         echo '<pre>';
         print_r($recommendations);

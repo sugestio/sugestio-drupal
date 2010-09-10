@@ -99,10 +99,6 @@ class SugestioClient {
      * @return array (itemid=>string, score=>double)
      */
     public function getRecommendations($userid, $options=array()) {
-        return $this->parseRecommendationsOrSimilarItems($this->getRecommendationsCsv($userid, $options));
-    }
-    
-    public function getRecommendationsCsv($userid, $options=array()) {
 
         $method = 'GET';
         $resource = '/users/' . urlencode($userid) . '/recommendations.csv';
@@ -110,7 +106,7 @@ class SugestioClient {
         $result = $this->execute($method, $resource, $options);
 
         if ($result['code'] == 200)
-            return $result;
+            return $this->parseRecommendationsOrSimilarItems($result);
         else
             throw new Exception($this->createExceptionMessage($result));
     }
@@ -129,21 +125,17 @@ class SugestioClient {
      * @return array (itemid=>string, score=>double)
      */
     public function getSimilar($itemid, $options=array()) {
-        return $this->parseRecommendationsOrSimilarItems($this->getSimilarCsv($itemid, $options));
-    }
-   
-    public function getSimilarCsv($itemid, $options=array()) {
+
         $method = 'GET';
         $resource = '/items/' . urlencode($itemid) . '/similar.csv';
 
         $result = $this->execute($method, $resource, $options);
 
         if ($result['code'] == 200)
-            return $result;
+            return $this->parseRecommendationsOrSimilarItems($result);
         else
             throw new Exception($this->createExceptionMessage($result));
     }
-   
 
     /**
      * Indicates the user did not like this recommendation. Returns the server response.

@@ -1,6 +1,9 @@
 <?php
 
 require_once dirname(__FILE__) . '/SugestioClient.php';
+require_once dirname(__FILE__) . '/SugestioConsumption.php';
+require_once dirname(__FILE__) . '/SugestioUser.php';
+require_once dirname(__FILE__) . '/SugestioItem.php';
 
 /**
  * This is a wrapper class for the SugestioClient.
@@ -19,7 +22,7 @@ class Controller {
      * Creates a new instance of the Controller wrapper.
      * @deprecated
      */
-    public function __construct($account=null, $secretkey=null, $base_url=null) {
+    public function __construct($base_url=null, $account=null, $secretkey=null, $security=null) {
         $this->client = new SugestioClient($account, $secretkey, $base_url);
     }
 
@@ -38,8 +41,9 @@ class Controller {
         Response:
 
         202 Accepted: Job was put on the queue and will be processed
-        401 Unauthorized: Missing or incorrect account credentials
-        406 Not Acceptable: Required arguments are missing or malformed
+        400 Bad Request: Required arguments are missing or malformed
+        401 Unauthorized: Missing or incorrect account credentials        
+        406 Not Acceptable
         500 Internal Server Error
     */
     public function addUser($id, $location_simple, $location_latlong, $gender, $birthday) {
@@ -71,8 +75,9 @@ class Controller {
         Response
 
         202 Accepted: Job was put on the queue and will be processed
+        400 Bad Request: Required arguments are missing or malformed
         401 Unauthorized: Missing or incorrect account credentials
-        406 Not Acceptable: Required arguments are missing or malformed
+        406 Not Acceptable
         500 Internal Server Error
     */
     public function addItem($id, $from, $until, $location_simple, $location_latlong, $creator=array(), $tag=array(), $category=array()) {
@@ -106,15 +111,16 @@ class Controller {
         Response
 
         202 Accepted: Job was put on the queue and will be processed
+        400 Bad Request: Required arguments are missing or malformed
         401 Unauthorized: Missing or incorrect account credentials
-        406 Not Acceptable: Required arguments are missing or malformed
+        406 Not Acceptable
         500 Internal Server Error
     */
     public function addConsumption($userid, $itemid, $type, $detail, $date, $location_simple, $location_latlong, $extra=array()) {
 
         $c = new SugestioConsumption($userid, $itemid); // userid, itemid
 
-        $c->date = $date; // automatically assign the current date
+        $c->date = $date;
         $c->type = $type;
         $c->detail = $detail;
         $c->location_simple = $location_simple;
@@ -164,8 +170,9 @@ class Controller {
          Response
 
         202 Accepted: Job was put on the queue and will be processed
+        400 Bad Request: Required arguments are missing or malformed
         401 Unauthorized: Missing or incorrect account credentials
-        406 Not Acceptable: Required arguments are missing or malformed
+        406 Not Acceptable
         500 Internal Server Error
     */
     public function deleteRecommendation($userid, $itemId) {
@@ -191,34 +198,46 @@ class Controller {
         return $similar;
     }
 
-    
+    public function getRecommendationsXml($userid) {
+        return $this->getRecommendations($userid);
+    }
+
     public function getRecommendationsJson($userid) {
-        return json_encode($this->getRecommendations($userid));
+    	
+    	$recs = $this->getRecommendations($userid); 
+    	
+    	for ($i=0; $i<count($recs); $i++) {			
+			$recs[$i]['itemid'] = array($recs[$i]['itemid']);
+			$recs[$i]['score'] = array($recs[$i]['score']);
+			$recs[$i]['algorithm'] = array($recs[$i]['algorithm']);
+		}
+    	
+        return json_encode($recs);
     }
 
     public function getRecommendationsCsv($userid) {
-       try {
-            $recommendations = $this->client->getRecommendationsCsv($userid);
-        } catch (Exception $e) {
-            $recommendations = array();
-        }
-
-        return $recommendations;
+        return $this->getRecommendations($userid);
     }
 
-    
+    public function getSimilarXml($itemid) {
+        return $this->getSimilar($itemid);
+    }
+
     public function getSimilarJson($itemid) {
-        return json_encode($this->getSimilar($itemid));
+        
+    	$recs = $this->getSimilar($itemid);
+    	
+    	for ($i=0; $i<count($recs); $i++) {			
+			$recs[$i]['itemid'] = array($recs[$i]['itemid']);
+			$recs[$i]['score'] = array($recs[$i]['score']);
+			$recs[$i]['algorithm'] = array($recs[$i]['algorithm']);
+		}
+    	
+        return json_encode($recs);    	
     }
 
     public function getSimilarCsv($itemid) {
-        try {
-            $similar = $this->client->getSimilarCsv($itemid);
-        } catch (Exception $e) {
-            $similar = array();
-        }
-
-        return $similar;
+        return $this->getSimilar($itemid);
     }
 
 }

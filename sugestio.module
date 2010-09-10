@@ -40,7 +40,7 @@ function sugestio_admin_settings() {
 	'#title' => t('Secret key'),
 	'#size' => 15,
     '#default_value' => variable_get('sugestio_key', ''),
-	'#description' => t('Your Sugestio secret key. This key will be used to authenticate and encrypt communication with the external Sugestio recommendation engine.'),
+	'#description' => t('Your Sugestio secret key. This key will be used to authenticate communication with the external Sugestio recommendation engine.'),
   );
   
   $form['sugestio_url'] = array(
@@ -62,7 +62,7 @@ function sugestio_admin_settings() {
     '#type' => 'textfield',
 	'#title' => 'Cache expire time',
 	'#size' => 15,
-	'#default_value' => variable_get('sugestio_expire',24),
+	'#default_value' => variable_get('sugestio_expire',1),
 	'#description' => t('The maximum time (in hours) the recommendations can be stored in the cache. After this period the recommendations will be refetched from the external Sugestio recommendation egine. Enter a value from the interval [1,48].'),
   );
   
@@ -70,14 +70,14 @@ function sugestio_admin_settings() {
     '#type' => 'checkbox',
 	'#title' => 'Use recommendation cache',
 	'#default_value' => variable_get('sugestio_rec_cache',1),
-	'#description' => t('Enables the cache for the recommendations. Recommendations will be fetched from cache first before calling the external Sugestio recommendation engine. Disabling this is only recommended for testing purposes.'),
+	'#description' => t('Enables the the recommendations cache. Recommendations will be fetched from the local cache before calling the external Sugestio recommendation engine. Disabling this is only recommended for testing purposes.'),
   );
   
   $form['sugestio_realtime_hook'] = array(
     '#type' => 'checkbox',
 	'#title' => 'Send realtime hook events',
 	'#default_value' => variable_get('sugestio_realtime_hook',1),
-	'#description' => t('Allows the hook events to be send in realtime to the external Sugestio recommendation engine. A hook events is for example triggered when a new user, item or vote is added to the system. If disabled, these events will be stored in (non-expiring) cache to be executed when cron is run. This can be disabled for performance reasons.'),
+	'#description' => t('Allows the hook events to be sent in realtime to the external Sugestio recommendation engine. A hook event is triggered when a new user, item or vote is added to the system. If disabled, these events will be stored in (non-expiring) cache to be performed when the Drupal cron is executed.'),
   );
   
   $form['sugestio_clicktracking'] = array(
@@ -147,7 +147,7 @@ function sugestio_block($op = 'list', $delta = 0, $edit = array()) {
         //Shows personal user recommendations for the current user.
 	    global $user;
 	    $block['subject'] = 'Personal recommendations';
-	    $block['content'] = theme_sugestio_list_items(sugestio_get_user_recommendations($user->uid), 'rec');       
+	    $block['content'] = theme_sugestio_list_items(sugestio_get_user_recommendations($user->uid), 'RECOMMENDATION');       
 	    return $block;
 		break;
 		
@@ -159,7 +159,7 @@ function sugestio_block($op = 'list', $delta = 0, $edit = array()) {
         }
         
   	    $block['subject'] = 'Similar items';
-        $block['content'] = theme_sugestio_list_items(sugestio_get_similar_items($nid), 'similar');
+        $block['content'] = theme_sugestio_list_items(sugestio_get_similar_items($nid), 'SIMILAR');
 	    return $block;
 		break;
     }
@@ -248,7 +248,10 @@ function sugestio_fetch_data($id, $category) {
       else if ($category == 'item') {
         $return = $controller->getSimilarJson($id);
       }
+      
       $alldata = json_decode($return);
+      //dsm($alldata);
+      //dsm("test");
 	  if (!empty($alldata)) {
         $number_items = variable_get('sugestio_number_recs', 5);
         $count = 0;
@@ -539,8 +542,8 @@ function sugestio_cron() {
 *   The array of recommendations.
 * 
 * @param type
-*   The type of the recommendations. Can be 'rec' for user recommendations
-*   or 'similar' for similar item recommendations. This variable is passed
+*   The type of the recommendations. Can be 'RECOMMENDATION' for user recommendations
+*   or 'SIMILAR' for similar item recommendations. This variable is passed
 *   on to the external Sugestio recommendation engine through clicktracking.
 */
 function theme_sugestio_list_items($arr, $type) {
@@ -565,7 +568,7 @@ function theme_sugestio_list_items($arr, $type) {
       
       //Inserts clicktacking if allowed.
       if (variable_get('sugestio_clicktracking', 1) == 1) {
-        $tracking = 'onclick="javascript:sugestio_clicked(\'' . $itemid . '\',\'' . $uid . '\',\'view:' . $type . '\',\'' . variable_get('sugestio_url','http://api.sugestio.com') .'\',\'' . variable_get('sugestio_account','') . '\')"';
+        $tracking = 'onclick="javascript:sugestio_clicked(\'' . $itemid . '\',\'' . $uid . '\',\'VIEW:' . $type . '\',\'' . variable_get('sugestio_url','http://api.sugestio.com') .'\',\'' . variable_get('sugestio_account','') . '\')"';
         
         //Imports the required javascript file.
         $module_path = drupal_get_path('module', 'sugestio');
@@ -596,6 +599,6 @@ function sugestio_error($e) {
  */
 function sugestio_get_controller() {
   require_once('lib/Controller.php');
-  $cont = new Controller(variable_get('sugestio_account',''), variable_get('sugestio_key', ''), variable_get('sugestio_url','http://api.sugestio.com'));
+  $cont = new Controller(variable_get('sugestio_url','http://api.sugestio.com'), variable_get('sugestio_account','sandbox'), variable_get('sugestio_key', 'demo'));
   return $cont;
 }
