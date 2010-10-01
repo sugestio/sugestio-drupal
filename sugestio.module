@@ -181,7 +181,7 @@ function sugestio_block($op = 'list', $delta = 0, $edit = array()) {
  *   [['itemid' => 'ID_OF_FETCHED_ITEM_1'],['itemid' => 'ID_OF_FETCHED_ITEM_2'],['itemid' => 'ID_OF_FETCHED_ITEM_3'],...]
  */
 function sugestio_get_user_recommendations($uid) {
-  $recommendations = sugestio_fetch_data($uid,'user');
+  $recommendations = sugestio_fetch_data($uid, 'user');
   return $recommendations;
 }
 
@@ -200,7 +200,7 @@ function sugestio_get_user_recommendations($uid) {
  *   [['itemid' => 'ID_OF_FETCHED_ITEM_1'],['itemid' => 'ID_OF_FETCHED_ITEM_2'],['itemid' => 'ID_OF_FETCHED_ITEM_3'],...]
  */
 function sugestio_get_similar_items($itemid) {
-  $similar = sugestio_fetch_data($itemid,'item');
+  $similar = sugestio_fetch_data($itemid, 'item');
   return $similar;
 }
 
@@ -238,36 +238,54 @@ function sugestio_fetch_data($id, $category) {
   }
   //Fetches data from the external Sugestio recommendation engine.
   if (empty($data)) {
-    $controller = sugestio_get_controller();
+  
+  	$client = sugestio_get_client();
+    
     try {
+    
       //For user recommendations.
       if ($category == 'user') {
-        $return = $controller->getRecommendationsJson($id);
-      }
-      //For item similarities (recommendations).
-      else if ($category == 'item') {
-        $return = $controller->getSimilarJson($id);
+		$recs = $client->getRecommendations($id);
       }
       
-      $alldata = json_decode($return);
+      //For item similarities (recommendations).
+      else if ($category == 'item') {
+        $recs = $client->getSimilar($id);
+      }
+      
+      //$alldata = json_decode($return);
       //dsm($alldata);
       //dsm("test");
-	  if (!empty($alldata)) {
+      
+	  if (!empty($recs)) {
+	  
         $number_items = variable_get('sugestio_number_recs', 5);
         $count = 0;
-        foreach ($alldata as $item) {
+        
+        foreach ($recs as $rec) {
+        
           if ($count >= $number_items) {
             break;
 		  }
-		  if (!empty($item->itemid[0])) {
-            $itemid = $item->itemid[0];
-            $data[] = array('itemid' => $itemid);
-           
-		    $count ++;
+		  
+		  if (!empty($rec['itemid'])) {
+		  
+		  	// determine actual node name and url
+		  	$link = $rec['itemid'];    
+		  	$title = 'Node ' . $rec['itemid'];
+		  	
+            $data[] = array(
+            	'itemid' => $rec['itemid'], 
+            	'title' => $title, 
+            	'link' => $link);
+            	           
+		    $count++;
           }
+          
         }
-        //Caches the result for easy access next time.
-        cache_set($category . $id, $data,  'cache_sugestio', mktime(variable_get('sugestio_expire', '24')));
+        
+        //Caches the result for quicker access next time.
+        cache_set($category . $id, $data, 'cache_sugestio', mktime(variable_get('sugestio_expire', '24')));
 	  }
     }
     catch(Exception $e) {
@@ -358,6 +376,7 @@ function sugestio_hooks($op, $data, $hook) {
         throw new Exception("Error $hook operation $op. Response code: $res");
       }
       //All went well. No caching of the call needed, so we return.
+      dsm("all went well");
       return;
     } 
     catch(Exception $e) {
@@ -390,20 +409,22 @@ function sugestio_user_execute($op, $account) {
   switch ($op) {
     case 'insert':
     case 'update':
-      $cont = sugestio_get_controller();
+
+	  $client = sugestio_get_client();      
       
       /*
       * Using the md5 hash of the e-mail of the user as the userid makes the data anonymous. 
       * Note that md5 hash of the userid would be too easy to reverse lookup.
       */
       
-      $userid = md5($account->mail);
-      $location_simple = '';
-      $location_latlong = '';
-      $gender = '';
-      $birthday = '';
-     
-      return $cont->addUser($userid, $location_simple, $location_latlong, $gender, $birthday);
+      $u = new SugestioUser(md5($account->mail));
+      $u->location_simple = '';
+      $u->location_latlong = '';
+      $u->gender = '';
+      $u->birthday = '';
+
+	  return $client->addUser($u);    
+      
       break;
   }
 }
@@ -426,18 +447,25 @@ function sugestio_node_execute($op, $node) {
   switch ($op) {
     case 'insert':
     case 'update':
-      $cont = sugestio_get_controller();
+    
+      $client = sugestio_get_client();
       
-      $id = $node->nid;
-      $from = $node->created;
-      $until = '';
-      $location_simple = '';
-      $location_latlong = '';
-      $creator = '';
-      $tag = '';
-      $category = '';
+      $sugestio_item = new SugestioItem($node->nid);
+      $sugestio_item->from = $node->created;
+      $sugestio_item->until = '';
+      $sugestio_item->location_simple = '';
+      $sugestio_item->location_latlong = '';
+      $sugestio_item->tag = array();
+      $sugestio_item->creator = array();
+      $sugestio_item->category = array(); 
       
-      return $cont->addItem($id, $from, $until, $location_simple, $location_latlong, $creator, $tag, $category);
+      
+      //dsm($node);
+                  
+      $result = $client->addItem($sugestio_item);      
+      
+      return $result;
+            
       break;
   }
 }
@@ -462,28 +490,35 @@ function sugestio_vote_execute($op, $vote) {
   $vote = $vote[0];
   switch ($op){
     case 'insert':
+	  // don't break, run the 'update' case
     case 'update':
-      $cont = sugestio_get_controller();
+      $client = sugestio_get_client();
       
       $userid = $vote['uid'];
       $itemid = $vote['content_id'];
-      $type = 'RATING';
+      
+      $consumption = new SugestioConsumption($userid, $itemid);
+      $consumption->type = 'RATING';
+      
       if ($vote['value_type'] == 'percent') {
-        $detail = 'PERCENTAGE:' . $vote['value'];
+      	$consumption->detail = 'PERCENTAGE:' . $vote['value'];
       }
+      
       else {
         /*
          * Generic way of passing the ratings. 
          * Do try to map these on the specific API of the external 
          * Sugestio recommendation engine!
          */
-        $detail = $vote['value_type'] . ':' . $vote['value'];
+        $consumption->detail = $vote['value_type'] . ':' . $vote['value'];
       }
-      $date = $vote['timestamp'];
-      $location_simple = '';
-      $location_latlong = '';
       
-      return $cont->addConsumption($userid, $itemid, $type, $detail, $date, $location_simple, $location_latlong);
+      $consumption->date = $vote['timestamp'];
+      $consumption->location_simple = '';
+      $consumption->location_latlong = '';
+      
+      return $client->addConsumption($consumption);
+      
       break;
   }
 }
@@ -562,8 +597,9 @@ function theme_sugestio_list_items($arr, $type) {
         break;
       }
       
-      $itemid =  $rec['itemid'];
-      $title = $itemid; //Insert something more useful if available.
+      $itemid = $rec['itemid'];
+      $link = $rec['link'];
+      $title = $rec['title'];
       $tracking = '';
       
       //Inserts clicktacking if allowed.
@@ -594,11 +630,21 @@ function sugestio_error($e) {
 }
 
 /**
- * Returns a Controller object that interfaces with 
- * the external Sugestio recommendation engine.
+ * Returns an instance of SugestioClient to interface with the Sugestio service
+ * @return SugestioClient
  */
-function sugestio_get_controller() {
-  require_once('lib/Controller.php');
-  $cont = new Controller(variable_get('sugestio_url','http://api.sugestio.com'), variable_get('sugestio_account','sandbox'), variable_get('sugestio_key', 'demo'));
-  return $cont;
+function sugestio_get_client() {	
+
+	require_once('lib/SugestioClient.php');
+	require_once('lib/SugestioItem.php');
+	require_once('lib/SugestioUser.php');
+	require_once('lib/SugestioConsumption.php');
+	
+	$account = variable_get('sugestio_account','sandbox');
+	$secret = variable_get('sugestio_key', 'demo');
+	$url = variable_get('sugestio_url','http://api.sugestio.com');	
+	
+	$client = new SugestioClient($account, $secret, $url);
+	
+  	return $client;
 }
