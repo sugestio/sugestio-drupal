@@ -1,6 +1,32 @@
 <?php
 
 /**
+ * Implementation of hook_requirements
+ */
+function sugestio_requirements($phase) {
+  $requirements = array();
+  // Ensure translations do not break at install time
+  $t = get_t();
+ 
+  $requirements['sugestio-php'] = array(
+    'title' => $t('Sugestio PHP library'),
+  );
+ 
+  $libraries = libraries_get_libraries();
+  if (isset($libraries['sugestio-php'])) {
+    $requirements['sugestio-php']['value'] = $t('Installed');
+    $requirements['sugestio-php']['severity'] = REQUIREMENT_OK;
+  }
+  else {
+    $requirements['sugestio-php']['value'] = $t('Not Installed');
+    $requirements['sugestio-php']['severity'] = REQUIREMENT_ERROR;
+    $requirements['sugestio-php']['description'] = $t('Please install the example library %url.', array('%url' => 'http://www.github.com/sugestio/sugestio-php'));
+  }
+ 
+  return $requirements;
+}
+
+/**
  * Implementation of hook_install().
  */
 function sugestio_install() {

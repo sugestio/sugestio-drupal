@@ -15,7 +15,7 @@ function sugestio_menu() {
     'page arguments' => array(
 	  'sugestio_admin_settings'),
     'access arguments' => array('access administration pages'),
-    'type' => MENU_NORMAL_ITEM,
+    'type' => MENU_NORM_ITEM,
   );
   
   return $items;
@@ -633,12 +633,12 @@ function sugestio_error($e) {
  * Returns an instance of SugestioClient to interface with the Sugestio service
  * @return SugestioClient
  */
-function sugestio_get_client() {	
+function sugestio_get_client() {
 
-	require_once('lib/SugestioClient.php');
-	require_once('lib/SugestioItem.php');
-	require_once('lib/SugestioUser.php');
-	require_once('lib/SugestioConsumption.php');
+	include_once(libraries_get_path('sugestio-php') . '/SugestioClient.php');
+	include_once(libraries_get_path('sugestio-php') . '/SugestioItem.php');
+	include_once(libraries_get_path('sugestio-php') . '/SugestioUser.php');
+	include_once(libraries_get_path('sugestio-php') . '/SugestioConsumption.php');	
 	
 	$account = variable_get('sugestio_account','sandbox');
 	$secret = variable_get('sugestio_key', 'demo');
@@ -647,4 +647,11 @@ function sugestio_get_client() {
 	$client = new SugestioClient($account, $secret, $url);
 	
   	return $client;
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function sugestio_enable() {
+	cache_clear_all();
 }

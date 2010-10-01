@@ -1,6 +1,6 @@
 ;$Id$
 name = "Sugestio"
-description = "Connects the Drupal system with the Sugestio recommendation engine"
+description = "Connects the Drupal 6 system with the Sugestio recommendation engine"
 core = 6.x
 php = 5.1
-
+dependencies[] = libraries
