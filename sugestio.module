@@ -474,39 +474,57 @@ function sugestio_node_execute($op, $node) {
  *   the hook.
  */
 function sugestio_vote_execute($op, $vote) {
-  //Unwraps the vote.
-  $vote = $vote[0];
+  
   switch ($op) {
     case 'insert':
-    // don't break, run the 'update' case
+      // don't break, run the 'update' case
     case 'update':
       $client = sugestio_get_client();
+      $res = 0;
+      
+      foreach ($vote as $v) {
+        $userid = $v['uid'];
+        $itemid = $v['content_id'];
 
-      $userid = $vote['uid'];
-      $itemid = $vote['content_id'];
+        $consumption = new SugestioConsumption($userid, $itemid);
+        $consumption->type = 'RATING';
+      
+        // normally, the user can submit a single rating for a node
+        // the default tag is simply 'vote', which we won't send to the service
+        // for multi axis voting, the vote tag indicates the rating aspect
+        // e.g., video, sound, mood, ... 
+        if ($v['tag'] != 'vote') {
+      	  $consumption->type .= ':' . $v['tag'];
+        }
 
-      $consumption = new SugestioConsumption($userid, $itemid);
-      $consumption->type = 'RATING';
+        if ($v['value_type'] == 'percent') {
+          $consumption->detail = 'PERCENTAGE:' . $v['value'];
+        } else {
+          /*
+           * Generic way of passing the ratings.
+           * Do try to map these on the specific API of the external
+           * Sugestio recommendation engine instead!
+           * This is just a fallback method
+           */
+          $consumption->detail = $v['value_type'] . ':' . $v['value'];
+        }
 
-      if ($vote['value_type'] == 'percent') {
-        $consumption->detail = 'PERCENTAGE:' . $vote['value'];
-      }
+        $consumption->date = $v['timestamp'];
+        $consumption->location_simple = '';
+        $consumption->location_latlong = '';
 
-      else {
-        /*
-         * Generic way of passing the ratings.
-         * Do try to map these on the specific API of the external
-         * Sugestio recommendation engine!
-         */
-        $consumption->detail = $vote['value_type'] . ':' . $vote['value'];
-      }
-
-      $consumption->date = $vote['timestamp'];
-      $consumption->location_simple = '';
-      $consumption->location_latlong = '';
-
-      return $client->addConsumption($consumption);
-
+        $res = $client->addConsumption($consumption);
+      
+        // if we failed to submit one of the votes, we return immediately and
+        // all votes are queued in the cron system for a new attempt later
+        // some votes might be recorded multiple times, but sugestio can ignore
+        // duplicates (they all have the same uid, nid and timestamp)
+        if ($res != 202)
+          return $res;
+          
+      }      
+      
+      return $res;
       break;
   }
 }
