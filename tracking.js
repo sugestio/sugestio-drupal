@@ -1,44 +1,27 @@
 /*
- * Tracking.js 0.23
+ * Tracking.js 1.00
  * (c) June 2010 - Sugestio - Ghent University
  * 
  * This javascript method should be called whenever a user clicks
  * a recommendation that was shown on the site. The appropriate information
  * will be passed along to the Sugestio servers for analytics purposes.
  * 
- * @param itemid		The id of the recommended item
- * @param userid		The id of the current user
- * @param type			The type of the consumption (eg. view:rec, view:similar, ...)
  * @param url           The base url of the Sugestio service
  * @param account       The Sugestio account that was used to fetch the recommendations.
+ * @param userid		The id of the current user 
+ * @param itemid		The id of the recommended item
+ * @param type			The type of the consumption (eg. VIEW, RATING,...)
+ * @param detail		Details about the consumption (eg. RECOMMENDATION, THUMB:UP,...)
  */
-function sugestio_clicked(var_itemid,var_userid,var_type,var_url,var_account)
-{
-	var url = var_url + "/api_GET.php?callback=?";
+function sugestio_clicked(var_url, var_account, var_userid, var_itemid, var_type, var_detail) {
 	
+	var url = var_url + "/api_GET.php?callback=?";	
 	var now = new Date();
 	now = now.format("isoDateTime", true);
 	
-	
-	var i = var_type.indexOf(':');
-	var var_type_detail = '';
-	
-	//Splits the type into type and detail vars
-	if (i != -1){
-		var_type_split = var_type.slice(0,i);
-		var_type_detail = var_type.slice(i+1);
-		var_type = var_type_split;
-	}
-	
-	$.getJSON(url, {itemid:var_itemid,userid:var_userid,type:var_type, detail:var_type_detail,date:now,account:var_account}
-	
-	);
-
+	$.getJSON(url, {itemid:var_itemid,userid:var_userid,type:var_type, detail:var_detail,date:now,account:var_account});
 	
 }
-
-
-
 
 /*
  * Date Format 1.2.3

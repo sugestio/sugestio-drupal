@@ -4,64 +4,64 @@
  * Implementation of hook_requirements
  */
 function sugestio_requirements($phase) {
-  $requirements = array();
-  // Ensure translations do not break at install time
-  $t = get_t();
- 
-  $requirements['sugestio-php'] = array(
+	$requirements = array();
+	// Ensure translations do not break at install time
+	$t = get_t();
+
+	$requirements['sugestio-php'] = array(
     'title' => $t('Sugestio PHP library'),
-  );
- 
-  $libraries = libraries_get_libraries();
-  if (isset($libraries['sugestio-php'])) {
-    $requirements['sugestio-php']['value'] = $t('Installed');
-    $requirements['sugestio-php']['severity'] = REQUIREMENT_OK;
-  }
-  else {
-    $requirements['sugestio-php']['value'] = $t('Not Installed');
-    $requirements['sugestio-php']['severity'] = REQUIREMENT_ERROR;
-    $requirements['sugestio-php']['description'] = $t('Please install the example library %url.', array('%url' => 'http://www.github.com/sugestio/sugestio-php'));
-  }
- 
-  return $requirements;
+	);
+
+	$libraries = libraries_get_libraries();
+	if (isset($libraries['sugestio-php'])) {
+		$requirements['sugestio-php']['value'] = $t('Installed');
+		$requirements['sugestio-php']['severity'] = REQUIREMENT_OK;
+	}
+	else {
+		$requirements['sugestio-php']['value'] = $t('Not Installed');
+		$requirements['sugestio-php']['severity'] = REQUIREMENT_ERROR;
+		$requirements['sugestio-php']['description'] = $t('Please install the example library %url.', array('%url' => 'http://www.github.com/sugestio/sugestio-php'));
+	}
+
+	return $requirements;
 }
 
 /**
  * Implementation of hook_install().
  */
 function sugestio_install() {
-  drupal_install_schema('sugestio');
+	drupal_install_schema('sugestio');
 }
 
 /**
  * Implementation of hook_uninstall().
  */
 function sugestio_uninstall() {
-  drupal_uninstall_schema('sugestio');
+	drupal_uninstall_schema('sugestio');
 }
 
 /**
  * Implementation of hook_schema().
  */
 function sugestio_schema() {
-  $schema = array();
+	$schema = array();
 
-  $schema['cache_sugestio_calls'] = sugestio_get_calls_structure();
+	$schema['cache_sugestio_calls'] = sugestio_get_calls_structure();
 
-  //Recommendations cache.
-  $schema['cache_sugestio'] = drupal_get_schema_unprocessed('system', 'cache');
-	
-  return $schema;
+	//Recommendations cache.
+	$schema['cache_sugestio'] = drupal_get_schema_unprocessed('system', 'cache');
+
+	return $schema;
 }
 
 /**
  * Returns the database structure for the storage
  * of the hook events that should be cached and executed
- * when cron is run. 
+ * when cron is run.
  */
 function sugestio_get_calls_structure() {
-  //Hook calls to external Sugestio recommendation engine cache.
-  $calls = array(
+	//Hook calls to external Sugestio recommendation engine cache.
+	$calls = array(
     'fields' => array(
 	  'cid' => array(
 	    'type' => 'serial',
@@ -85,10 +85,10 @@ function sugestio_get_calls_structure() {
 /**
  * Implementation of hook_flush_caches().
  *
- * This tells Drupal's cache handling system the name of our caching 
- * table, so expired items will be purged automatically and this table 
+ * This tells Drupal's cache handling system the name of our caching
+ * table, so expired items will be purged automatically and this table
  * also affected by the empty all caches function.
  */
 function sugestio_flush_caches() {
-  return array('cache_sugestio');
+	return array('cache_sugestio');
 }
