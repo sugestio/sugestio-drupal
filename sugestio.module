@@ -253,10 +253,6 @@ function sugestio_fetch_data($id, $category) {
         $recs = $client->getSimilar($id);
       }
 
-      //$alldata = json_decode($return);
-      //dsm($alldata);
-      //dsm("test");
-
       if (!empty($recs)) {
        
         $number_items = variable_get('sugestio_number_recs', 5);
@@ -372,8 +368,7 @@ function sugestio_hooks($op, $data, $hook) {
       if ($res != 202) {
         throw new Exception("Error $hook operation $op. Response code: $res");
       }
-      //All went well. No caching of the call needed, so we return.
-      dsm("all went well");
+      //All went well. No caching of the call needed, so we return.      
       return;
     } catch (Exception $e) {
       sugestio_error($e);
