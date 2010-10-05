@@ -494,12 +494,13 @@ function sugestio_vote_execute($op, $vote) {
         // for multi axis voting, the vote tag indicates the rating aspect
         // e.g., video, sound, mood, ... 
         if ($v['tag'] != 'vote') {
-      	  $consumption->type .= ':' . $v['tag'];
+          $consumption->type .= ':' . $v['tag'];
         }
 
         if ($v['value_type'] == 'percent') {
           $consumption->detail = 'PERCENTAGE:' . $v['value'];
-        } else {
+        } 
+        else {
           /*
            * Generic way of passing the ratings.
            * Do try to map these on the specific API of the external
