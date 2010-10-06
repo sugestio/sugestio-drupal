@@ -406,17 +406,21 @@ function sugestio_user_execute($op, $account) {
   switch ($op) {
     case 'insert':
     case 'update':
+      
+      /* 
+       * Uncomment and complete the code below to submit user metadata
+       * See http://www.sugestio.com/documentation for information on 
+       * what data you can send
+       */    
+    
+      // $client = sugestio_get_client();
+      // $u = new SugestioUser(sugestio_anonymize($account->uid));    
+      // $u->location_latlong = '';
+      // $u->gender = '';
+      // $u->birthday = '';
+      // return $client->addUser($u);    
 
-    $client = sugestio_get_client();
-
-    $u = new SugestioUser(sugestio_anonymize($account->uid));    
-    //$u->location_latlong = '';
-    //$u->gender = '';
-    //$u->birthday = '';
-
-    return $client->addUser($u);
-
-    break;
+      break;
   }
 }
 
@@ -439,20 +443,24 @@ function sugestio_node_execute($op, $node) {
     case 'insert':
     case 'update':
 
-      $client = sugestio_get_client();
-
-      $sugestio_item = new SugestioItem(sugestio_anonymize($node->nid));      
-      //$sugestio_item->from = '';
-      //$sugestio_item->until = '';
-      //$sugestio_item->location_simple = '';
-      //$sugestio_item->location_latlong = '';
-      //$sugestio_item->tag = array();
-      //$sugestio_item->creator = array();
-      //$sugestio_item->category = array();
+      /* 
+       * Uncomment and complete the code below to submit item metadata
+       * See http://www.sugestio.com/documentation for information on 
+       * what data you can send
+       */
       
-      $result = $client->addItem($sugestio_item);
-
-      return $result;
+      // $client = sugestio_get_client();
+      // $sugestio_item = new SugestioItem(sugestio_anonymize($node->nid));      
+      // $sugestio_item->from = '';
+      // $sugestio_item->until = '';
+      // $sugestio_item->location_simple = '';
+      // $sugestio_item->location_latlong = '';
+      // $sugestio_item->tag = array();
+      // $sugestio_item->creator = array();
+      // $sugestio_item->category = array();
+      
+      // $result = $client->addItem($sugestio_item);
+      // return $result;
 
       break;
   }
