@@ -165,7 +165,7 @@ function sugestio_block($op = 'list', $delta = 0, $edit = array()) {
         //Shows personal user recommendations for the current user.
         global $user;
         $block['subject'] = 'Personal recommendations';
-        $block['content'] = theme_sugestio_list_items(sugestio_get_user_recommendations($user->uid), 'RECOMMENDATION');
+        $block['content'] = sugestio_build_content(sugestio_get_user_recommendations($user->uid), 'RECOMMENDATION');
         return $block;
         break;
 
@@ -177,7 +177,7 @@ function sugestio_block($op = 'list', $delta = 0, $edit = array()) {
         }
 
         $block['subject'] = 'Similar items';
-        $block['content'] = theme_sugestio_list_items(sugestio_get_similar_items($nid), 'SIMILAR');
+        $block['content'] = sugestio_build_content(sugestio_get_similar_items($nid), 'SIMILAR');
         return $block;
         break;
     }
@@ -580,7 +580,7 @@ function sugestio_cron() {
  * Transforms the given array of recommendations
  * into a simple HTML styled bullet list.
  *
- * If clicktracking is enabled, it is added to the
+ * If clicktracking is enabled, javascript is added to the
  * generated links.
  * <ul>
  *   <li>
@@ -596,12 +596,8 @@ function sugestio_cron() {
  *   or 'SIMILAR' for similar item recommendations. This variable is passed
  *   on to the external Sugestio recommendation engine through clicktracking.
  */
-function theme_sugestio_list_items($arr, $type) {
-
-  $begin = '<ul>';
-  $middle = '';
-  $end = '</ul>';
-
+function sugestio_build_content($arr, $type) {
+	  
   $count = 0;
   $max_items = variable_get('sugestio_number_recs', 5);
   global $user ;
@@ -614,6 +610,8 @@ function theme_sugestio_list_items($arr, $type) {
     drupal_add_js($module_path . "/tracking.js");
   }
 
+  $data = array();
+  
   foreach ($arr as $node) {
     if (is_object($node)) {
       if ($count >= $max_items) {
@@ -637,12 +635,11 @@ function theme_sugestio_list_items($arr, $type) {
         );
          
       }
-      $node_link = l($node->title, $node->path, $options);
-      $middle .= '<li>' . $node_link . '</li>';
+      $data[] = l($node->title, $node->path, $options);      
       $count ++;
     }
   }
-  return $begin . $middle . $end;
+  return theme_item_list($data, NULL, 'UL');
 }
 
 /**
