@@ -1,0 +1,52 @@
+-- REQUIREMENTS --
+
+* Drupal 6.x
+
+* PHP 5.x
+
+* Libraries module <http://drupal.org/project/image>
+
+* Sugestio PHP library (external) <http://github.com/sugestio/sugestio-php> 
+
+* Fivestar module (optional) <http://drupal.org/project/fivestar>
+
+-- INSTALLATION --
+
+* Begin by ensuring the Libraries API is installed and enabled
+
+* Upload the Sugestio PHP library to [/sites/all]/libraries/sugestio-php
+
+* Upload this module to [/sites/all]/modules/sugestio 
+
+* Ensure that your file and directory structure look like this:
+
+  [/sites/all]/libraries/sugestio-php
+                           |- SugestioClient.php
+                           |- SugestioConsumption.php
+                           |- ...
+                           
+  [/sites/all]/modules/sugestio
+                           |- sugestio.info
+                           |- sugestio.install
+                           |- sugestio.module
+                           |- tracking.js
+                           |- ...
+                           
+* The Sugestio library has a Settings.php. You do not have to edit this file, 
+everything can be configured through the Drupal's administration system.
+
+* Go to Administer > Site building > Modules and enable the Sugestio module
+
+* Run Drupal's update.php
+
+* Go to Administer > Site configuration > Sugestio settings and make any changes
+
+* By default, the Sugestio module is configured to use the Sandbox account credentials 
+and will work out of the box. If you use the fivestar voting system on your website, 
+votes will now be automatically submitted to the Sugestio service, 
+where they will be discarded. See README.md for more information about the Sandbox. 
+
+Go to http://www.sugestio.com to request a free developer account if you want to 
+work with real data.  
+
+
