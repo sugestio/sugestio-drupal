@@ -1,3 +1,4 @@
+// $Id$
 /*
  * Tracking.js 1.00
  * This javascript method should be called whenever a user clicks

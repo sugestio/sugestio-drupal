@@ -1,5 +1,4 @@
 <?php
-
 // $Id$
 
 /**
@@ -10,17 +9,21 @@ function sugestio_menu() {
 
   $items['admin/settings/sugestio'] = array(
       'title' => 'Sugestio settings',
-      'description' => 'Tweak some options of the Sugestio module.',
+      'description' => 'Configure the Sugestion Recommender system settings page',
       'page callback' => 'drupal_get_form',
-      'page arguments' => array(
-      'sugestio_admin_settings'),
-      'access arguments' => array('access administration pages'),
+      'page arguments' => array('sugestio_admin_settings'),
+      'access arguments' => array('administer sugestio'),
       'type' => MENU_NORMAL_ITEM,
   );
-
   return $items;
 }
 
+/**
+ * Implementation of hook_perm
+ */
+function sugestio_perm() {
+  return array('administer sugestio');
+}
 /**
  * Implementation of hook_settings.
  */
@@ -28,78 +31,78 @@ function sugestio_admin_settings() {
   $form = array();
 
   $form['sugestio_account'] = array(
-  '#type' => 'textfield',
-  '#size' => 15,
-  '#title' => t('Account name'),
-  '#description' => t('Your Sugestio account name.'),
-  '#default_value' => variable_get('sugestio_account', ''),
+    '#type' => 'textfield',
+    '#size' => 15,
+    '#title' => t('Account name'),
+    '#description' => t('Your Sugestio account name.'),
+    '#default_value' => variable_get('sugestio_account', ''),
   );
 
   $form['sugestio_key'] = array(
-  '#type' => 'textfield',
-  '#title' => t('Secret key'),
-  '#size' => 15,
-  '#default_value' => variable_get('sugestio_key', ''),
-  '#description' => t('Your Sugestio secret key. This key will be used to authenticate communication with the external Sugestio recommendation engine.'),
+    '#type' => 'textfield',
+    '#title' => t('Secret key'),
+    '#size' => 15,
+    '#default_value' => variable_get('sugestio_key', ''),
+    '#description' => t('Your Sugestio secret key. This key will be used to authenticate communication with the external Sugestio recommendation engine.'),
   );
 
   $form['sugestio_url'] = array(
-  '#type' => 'textfield',
-  '#default_value' => variable_get('sugestio_url', 'http://api.sugestio.com'),
-  '#title' => 'Sugestio URL',
-  '#description' => t('The URL of the external Sugestio recommendation engine. Remove any trailing /.'),
+    '#type' => 'textfield',
+    '#default_value' => variable_get('sugestio_url', 'http://api.sugestio.com'),
+    '#title' => 'Sugestio URL',
+    '#description' => t('The URL of the external Sugestio recommendation engine. Remove any trailing /.'),
   );
 
   $form['sugestio_number_recs'] = array(
-  '#type' => 'textfield',
-  '#title' => 'Number of recommended items',
-  '#size' => 15,
-  '#description' => t('The number of recommended items that should be fetched. This affects both the number of recommended items that will be fetched from the external Sugestio recommendation engine as the number of items that will be shown in the standard Sugestio Recommended Items block. Enter a value from the interval [1,100].'),
-  '#default_value' => variable_get('sugestio_number_recs', 5),
+    '#type' => 'textfield',
+    '#title' => 'Number of recommended items',
+    '#size' => 15,
+    '#description' => t('The number of recommended items that should be fetched. This affects both the number of recommended items that will be fetched from the external Sugestio recommendation engine as the number of items that will be shown in the standard Sugestio Recommended Items block. Enter a value from the interval [1,100].'),
+    '#default_value' => variable_get('sugestio_number_recs', 5),
   );
 
   $form['sugestio_expire'] = array(
-  '#type' => 'textfield',
-  '#title' => 'Cache expire time',
-  '#size' => 15,
-  '#default_value' => variable_get('sugestio_expire', 1),
-  '#description' => t('The maximum time (in hours) the recommendations can be stored in the cache. After this period the recommendations will be refetched from the external Sugestio recommendation egine. Enter a value from the interval [1,48].'),
+    '#type' => 'textfield',
+    '#title' => 'Cache expire time',
+    '#size' => 15,
+    '#default_value' => variable_get('sugestio_expire', 1),
+    '#description' => t('The maximum time (in hours) the recommendations can be stored in the cache. After this period the recommendations will be refetched from the external Sugestio recommendation egine. Enter a value from the interval [1,48].'),
   );
 
   $form['sugestio_rec_cache'] = array(
-  '#type' => 'checkbox',
-  '#title' => 'Use recommendation cache',
-  '#default_value' => variable_get('sugestio_rec_cache', 1),
-  '#description' => t('Enables the the recommendations cache. Recommendations will be fetched from the local cache before calling the external Sugestio recommendation engine. Disabling this is only recommended for testing purposes.'),
+    '#type' => 'checkbox',
+    '#title' => 'Use recommendation cache',
+    '#default_value' => variable_get('sugestio_rec_cache', 1),
+    '#description' => t('Enables the the recommendations cache. Recommendations will be fetched from the local cache before calling the external Sugestio recommendation engine. Disabling this is only recommended for testing purposes.'),
   );
 
   $form['sugestio_realtime_hook'] = array(
-  '#type' => 'checkbox',
-  '#title' => 'Send realtime hook events',
-  '#default_value' => variable_get('sugestio_realtime_hook', 1),
-  '#description' => t('Allows the hook events to be sent in realtime to the external Sugestio recommendation engine. A hook event is triggered when a new user, item or vote is added to the system. If disabled, these events will be stored in (non-expiring) cache to be performed when the Drupal cron is executed.'),
+    '#type' => 'checkbox',
+    '#title' => 'Send realtime hook events',
+    '#default_value' => variable_get('sugestio_realtime_hook', 1),
+    '#description' => t('Allows the hook events to be sent in realtime to the external Sugestio recommendation engine. A hook event is triggered when a new user, item or vote is added to the system. If disabled, these events will be stored in (non-expiring) cache to be performed when the Drupal cron is executed.'),
   );
 
   $form['sugestio_clicktracking'] = array(
-  '#type' => 'checkbox',
-  '#title' => 'Enable click tracking',
-  '#default_value' => variable_get('sugestio_clicktracking', 1),
-  '#description' => t('If click tracking is enabled, javascript code will be inserted into the generated recommended items links. When clicked, client side calls will be made in the background to the external Sugestio recommendation engine to report this click. By gathering this information the external Sugestio recommendation engine can provide more extensive and relevant statistics about the generated recommendations.'),
+    '#type' => 'checkbox',
+    '#title' => 'Enable click tracking',
+    '#default_value' => variable_get('sugestio_clicktracking', 1),
+    '#description' => t('If click tracking is enabled, javascript code will be inserted into the generated recommended items links. When clicked, client side calls will be made in the background to the external Sugestio recommendation engine to report this click. By gathering this information the external Sugestio recommendation engine can provide more extensive and relevant statistics about the generated recommendations.'),
   );
   
   $form['sugestio_anonymize'] = array(
-  '#type' => 'checkbox',
-  '#title' => 'Anonymize data',
-  '#default_value' => variable_get('sugestio_anonymize', 1),
-  '#description' => t('Use a salted hash of the user id and node id instead of the actual values to protect the privacy of the user.'),
+    '#type' => 'checkbox',
+    '#title' => 'Anonymize data',
+    '#default_value' => variable_get('sugestio_anonymize', 1),
+    '#description' => t('Use a salted hash of the user id and node id instead of the actual values to protect the privacy of the user.'),
   );
   
   $form['sugestio_salt'] = array(
-  '#type' => 'textfield',
-  '#title' => 'Salt',
-  '#size' => 15,
-  '#default_value' => variable_get('sugestio_salt', 'tiU0t9uml5Ciunl'),
-  '#description' => t('If you enable the anonymized data option above, this value will be used to create salted hashes. You should change it from the default and store a copy of the new value in a safe place!'),
+    '#type' => 'textfield',
+    '#title' => 'Salt',
+    '#size' => 15,
+    '#default_value' => variable_get('sugestio_salt', 'tiU0t9uml5Ciunl'),
+    '#description' => t('If you enable the anonymized data option above, this value will be used to create salted hashes. You should change it from the default and store a copy of the new value in a safe place!'),
   );
 
   return system_settings_form($form);
@@ -253,45 +256,33 @@ function sugestio_fetch_data($id, $category) {
   }
   //Fetches data from the external Sugestio recommendation engine.
   if (empty($data)) {
-
     $client = sugestio_get_client();
-
     try {
-
       //For user recommendations.
       if ($category == 'user') {
         $recs = $client->getRecommendations($id);
       }
-
       //For item similarities (recommendations).
       elseif ($category == 'item') {
         $recs = $client->getSimilar($id);
       }
-
       if (!empty($recs)) {
        
         $number_items = variable_get('sugestio_number_recs', 5);
         $count = 0;
-
         foreach ($recs as $rec) {
-
           if ($count >= $number_items) {
             break;
           }
-
           if (!empty($rec['itemid'])) {
-           
             $node = node_load($rec['itemid'], NULL, FALSE);
-           
             if (is_object($node)) {            
               $data[] = $node;
               $count++;
             }
           
           }
-
         }
-
         //Caches the result for quicker access next time.
         cache_set($category . $id, $data, 'cache_sugestio', mktime(variable_get('sugestio_expire', '24')));
       }
@@ -616,18 +607,13 @@ function theme_sugestio_list_items($arr, $type) {
   }
 
   foreach ($arr as $node) {
-
     if (is_object($node)) {
-
       if ($count >= $max_items) {
         break;
       }
-
       $options = array();
-
       // inserts onclick javascript if clicktracking is enabled
       if ($clicktracking) {
-
         $sugestio_url = variable_get('sugestio_url', 'http://api.sugestio.com');
         $sugestio_account = variable_get('sugestio_account', 'sandbox');
         $consumption_detail = $type; // indicate if the user clicked a personal recommendation or a similar item
@@ -643,13 +629,11 @@ function theme_sugestio_list_items($arr, $type) {
         );
          
       }
-
       $node_link = l($node->title, $node->path, $options);
       $middle .= '<li>' . $node_link . '</li>';
       $count ++;
     }
   }
-
   return $begin . $middle . $end;
 }
 
