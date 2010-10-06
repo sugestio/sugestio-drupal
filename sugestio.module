@@ -409,7 +409,7 @@ function sugestio_user_execute($op, $account) {
 
     $client = sugestio_get_client();
 
-    $u = new SugestioUser(anonymize($account->uid));    
+    $u = new SugestioUser(sugestio_anonymize($account->uid));    
     //$u->location_latlong = '';
     //$u->gender = '';
     //$u->birthday = '';
@@ -441,7 +441,7 @@ function sugestio_node_execute($op, $node) {
 
       $client = sugestio_get_client();
 
-      $sugestio_item = new SugestioItem(anonymize($node->nid));      
+      $sugestio_item = new SugestioItem(sugestio_anonymize($node->nid));      
       //$sugestio_item->from = '';
       //$sugestio_item->until = '';
       //$sugestio_item->location_simple = '';
