@@ -9,7 +9,7 @@ function sugestio_menu() {
 
   $items['admin/settings/sugestio'] = array(
       'title' => 'Sugestio settings',
-      'description' => 'Configure the Sugestion Recommender system settings page',
+      'description' => 'Configure the Sugestio Recommender system settings.',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('sugestio_admin_settings'),
       'access arguments' => array('administer sugestio'),
@@ -35,14 +35,14 @@ function sugestio_admin_settings() {
     '#size' => 15,
     '#title' => t('Account name'),
     '#description' => t('Your Sugestio account name.'),
-    '#default_value' => variable_get('sugestio_account', ''),
+    '#default_value' => variable_get('sugestio_account', 'sandbox'),
   );
 
   $form['sugestio_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Secret key'),
     '#size' => 15,
-    '#default_value' => variable_get('sugestio_key', ''),
+    '#default_value' => variable_get('sugestio_key', 'demo'),
     '#description' => t('Your Sugestio secret key. This key will be used to authenticate communication with the external Sugestio recommendation engine.'),
   );
 
