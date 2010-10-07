@@ -4,7 +4,7 @@
 
 * PHP 5.x
 
-* Libraries module <http://drupal.org/project/image>
+* Libraries API <http://drupal.org/project/libraries>
 
 * Sugestio PHP library (external) <http://github.com/sugestio/sugestio-php> 
 
@@ -32,8 +32,8 @@
                            |- tracking.js
                            |- ...
                            
-* The Sugestio library has a Settings.php. You do not have to edit this file, 
-everything can be configured through the Drupal's administration system.
+* The Sugestio PHP library has a Settings.php. You do not have to edit this file, 
+everything can be configured through Drupal's administration system.
 
 * Go to Administer > Site building > Modules and enable the Sugestio module
 
@@ -45,8 +45,5 @@ everything can be configured through the Drupal's administration system.
 and will work out of the box. If you use the fivestar voting system on your website, 
 votes will now be automatically submitted to the Sugestio service, 
 where they will be discarded. See README.md for more information about the Sandbox. 
-
-Go to http://www.sugestio.com to request a free developer account if you want to 
-work with real data.  
 
 
