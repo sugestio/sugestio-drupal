@@ -9,7 +9,7 @@ similar nodes based on [Fivestar](http://drupal.org/project/fivestar) voting beh
 Sugestio is a scalable and fault tolerant service that now brings the power of 
 web personalisation to all developers. The RESTful web service provides an easy to use 
 interface and a set of developer libraries that enable you to enrich 
-your content portals, e-commerce sites and other content based websites.
+your content portals, e-commerce sites and other content-based websites.
 
 ### Access credentials and the Sandbox
 
@@ -26,7 +26,7 @@ and similar items for items 1 through 5.
 When you are ready to work with real data, you may apply for a developer account through 
 the [Sugestio website](http://www.sugestio.com).  
 
-## About this library
+## About this module
 
 ### Features
 
