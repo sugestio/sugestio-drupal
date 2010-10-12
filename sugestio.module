@@ -636,10 +636,14 @@ function sugestio_build_content($arr, $type) {
          
       }
       $data[] = l($node->title, $node->path, $options);      
-      $count ++;
+      $count++;
     }
   }
-  return theme_item_list($data, NULL, 'UL');
+  
+  if ($count == 0)
+    return "None";
+  else
+    return theme_item_list($data, NULL, 'UL');
 }
 
 /**
