@@ -6,9 +6,10 @@
 
 * Libraries API <http://drupal.org/project/libraries>
 
-* Sugestio PHP library (external) <http://github.com/sugestio/sugestio-php> 
+* Fivestar module <http://drupal.org/project/fivestar>
 
-* Fivestar module (optional) <http://drupal.org/project/fivestar>
+* Sugestio PHP library (external) <http://github.com/sugestio/sugestio-php>
+
 
 -- INSTALLATION --
 
