@@ -44,10 +44,10 @@ Hooks are provided for the following features:
 
 ### Requirements
 
-This module depends on the [Libraries API](http://drupal.org/project/libraries) and 
+This module depends on the [Libraries API](http://drupal.org/project/libraries), 
+[Fivestar](http://drupal.org/project/fivestar) and 
 [sugestio-php](http://github.com/sugestio/sugestio-php), an external library 
-for communicating with the webservice. [Fivestar](http://drupal.org/project/fivestar) 
-is required if you want to submit voting data. See INSTALL.txt for detailed instructions.
+for communicating with the webservice. See INSTALL.txt for detailed instructions.
 
 # License
 
