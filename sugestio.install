@@ -38,6 +38,16 @@ function sugestio_install() {
  */
 function sugestio_uninstall() {
   drupal_uninstall_schema('sugestio');
+  variable_del('sugestio_account');
+  variable_del('sugestio_key');
+  variable_del('sugestio_url');
+  variable_del('sugestio_number_recs');
+  variable_del('sugestio_expire');
+  variable_del('sugestio_rec_cache');
+  variable_del('sugestio_realtime_hook');
+  variable_del('sugestio_clicktracking');
+  variable_del('sugestio_anonymize');
+  variable_del('sugestio_salt');    
 }
 
 /**
