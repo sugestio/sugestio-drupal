@@ -1,6 +1,7 @@
 ;$Id$
-name = "Sugestio"
-description = "Connects the Drupal 6 system with the Sugestio recommendation engine"
+name = Sugestio
+description = Get recommendations based on five-star voting through Sugestio recommendation service.
 core = 6.x
 php = 5.1
 dependencies[] = libraries
+dependencies[] = fivestar
