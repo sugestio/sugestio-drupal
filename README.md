@@ -48,3 +48,22 @@ This module depends on the [Libraries API](http://drupal.org/project/libraries) 
 [sugestio-php](http://github.com/sugestio/sugestio-php), an external library 
 for communicating with the webservice. [Fivestar](http://drupal.org/project/fivestar) 
 is required if you want to submit voting data. See INSTALL.txt for detailed instructions.
+
+# License
+
+Reference implementation of a Drupal 6 module for the Sugestio recommendation service
+Copyright (C) 2010  Sugestio.com
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
