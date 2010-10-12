@@ -288,7 +288,10 @@ function sugestio_fetch_data($id, $category) {
       }
       
     } catch (Exception $e) {
-      sugestio_error($e);
+      //sugestio_error($e);
+      // error 404 means there are no recommendations for this user, or no similar items
+      // just return an empty array
+      return array();
     }
   }
 
