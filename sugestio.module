@@ -123,7 +123,7 @@ function sugestio_admin_settings_validate($form, &$form_state) {
 
   //Secret key maximum length.
   $key = $form_state['values']['sugestio_key'];
-  if (strlen($key) > 50) {
+  if (drupal_strlen($key) > 50) {
     form_set_error('sugestio_key', t('Your secret key is too long.'));
   }
 
@@ -133,7 +133,7 @@ function sugestio_admin_settings_validate($form, &$form_state) {
     form_set_error('sugestio_account', t('Account name can\'t be empty.'));
   }
   //Maximum length account name.
-  elseif (strlen($account) > 50) {
+  elseif (drupal_strlen($account) > 50) {
     form_set_error('sugestio_account', t('Your account name is too long.'));
   }
 
