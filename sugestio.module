@@ -2,6 +2,16 @@
 // $Id$
 
 /**
+ * @file
+ * Provides a connection to the Sugestio recommendation service.
+ *
+ * When enabled, the Sugestio module submits five-star votes to the 
+ * recommendation service. Users get personalized recommendations 
+ * based on their rating behaviour. Each node gets a list of nodes 
+ * that are similar.
+ */
+
+/**
  * Implementation of hook_menu.
  */
 function sugestio_menu() {
@@ -155,8 +165,10 @@ function sugestio_block($op = 'list', $delta = 0, $edit = array()) {
 
   if ($op == 'list') {
     $blocks[0]['info'] = t('Sugestio: Personal recommendations');
+    $blocks[0]['cache'] = BLOCK_NO_CACHE;    
     $blocks[1]['info'] = t('Sugestio: Similar items');
-    return $blocks;
+    $blocks[1]['cache'] = BLOCK_NO_CACHE;    
+    return $blocks;    
   }
   elseif ($op == 'view') {
 
@@ -387,7 +399,7 @@ function sugestio_hooks($op, $data, $hook) {
 
   //Adds call to the Sugestio call cache.
   $arr = array('data' => array('op' => $op, 'data' => $data), 'event' => $hook);
-  drupal_write_record('cache_sugestio_calls', $arr);
+  drupal_write_record('cron_sugestio_calls', $arr);
 }
 
 /**
@@ -549,7 +561,7 @@ function sugestio_vote_execute($op, $vote) {
  */
 function sugestio_cron() {
   //Reads call cache.
-  $result = db_query('SELECT * FROM cache_sugestio_calls');
+  $result = db_query('SELECT * FROM cron_sugestio_calls');
 
   while ($call = db_fetch_object($result)) {
     //Unpacks the data stored in the call.
@@ -570,7 +582,7 @@ function sugestio_cron() {
 
       //Deletes the call entry from DB if succesful.
       if ($res == 202) {
-        db_query("DELETE FROM cache_sugestio_calls WHERE cid=%d", $call->cid);
+        db_query("DELETE FROM cron_sugestio_calls WHERE cid=%d", $call->cid);
       }
     }
     catch (Exception $e) {

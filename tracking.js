@@ -1,9 +1,11 @@
 // $Id$
 /*
- * Tracking.js 1.00
- * This javascript method should be called whenever a user clicks
- * a recommendation that was shown on the site. The appropriate information
- * will be passed along to the Sugestio servers for analytics purposes.
+ * @file
+ * Submits a consumption to the recommendation service.
+ * 
+ * When clicktracking is enabled, this javascript method is called whenever a user clicks
+ * on a recommendation that is shown on the site. The appropriate consumption information
+ * is submitted to the Sugestio service for analytics purposes.
  * 
  * @param url           The base url of the Sugestio service
  * @param account       The Sugestio account that was used to fetch the recommendations.

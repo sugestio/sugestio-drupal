@@ -1,6 +1,11 @@
 <?php
 // $Id$
 /**
+ * @file
+ * Install, update and uninstall functions for the sugestio module.
+ */
+
+/**
  * Implementation of hook_requirements
  */
 function sugestio_requirements($phase) {
@@ -56,7 +61,7 @@ function sugestio_uninstall() {
 function sugestio_schema() {
   $schema = array();
   
-  $schema['cache_sugestio_calls'] = sugestio_get_calls_structure();
+  $schema['cron_sugestio_calls'] = sugestio_get_calls_structure();
   
   //Recommendations cache.
   $schema['cache_sugestio'] = drupal_get_schema_unprocessed('system', 'cache');
