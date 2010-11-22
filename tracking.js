@@ -2,11 +2,13 @@
 /*
  * @file
  * Submits a consumption to the recommendation service.
- * 
+ */
+
+ /*
  * When clicktracking is enabled, this javascript method is called whenever a user clicks
  * on a recommendation that is shown on the site. The appropriate consumption information
- * is submitted to the Sugestio service for analytics purposes.
- * 
+ * is submitted to the Sugestio service for analytics purposes.  
+ *  
  * @param url           The base url of the Sugestio service
  * @param account       The Sugestio account that was used to fetch the recommendations.
  * @param userid		The id of the current user 
