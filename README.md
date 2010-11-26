@@ -35,6 +35,7 @@ The following [API](http://www.sugestio.com/documentation) features are fully im
 * get personalized recommendations for a given user
 * get nodes that are similar to the current node
 * submit user activity (consumptions): fivestar-votes and optional click-tracking
+* submit node title and URL through hook_nodeapi
 
 Hooks are provided for the following features:
 
@@ -52,7 +53,7 @@ for communicating with the webservice. See INSTALL.txt for detailed instructions
 # License
 
 Reference implementation of a Drupal 6 module for the Sugestio recommendation service
-Copyright (C) 2010  Sugestio.com
+Copyright (C) 2010 Sugestio.com
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
