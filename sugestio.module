@@ -286,10 +286,26 @@ function sugestio_fetch_data($id, $category) {
           if ($count >= $number_items) {
             break;
           }
+          
           if (!empty($rec['itemid'])) {
-            $node = node_load($rec['itemid'], NULL, FALSE);
-            if (is_object($node)) {            
-              $data[] = $node;
+          	$add = TRUE;
+          	
+            if (empty($rec['item']))
+              $rec['item'] = array();
+            
+          	if (empty($rec['item']['title']) || empty($rec['item']['permalink'])) {
+          	  $node = node_load($rec['itemid'], NULL, FALSE);
+          	  
+          	  if (is_object($node)) {
+          	    $rec['item']['title'] = $node->title;
+          	    $rec['item']['permalink'] = $node->path;
+              } else {
+              	$add = FALSE;
+              }
+          	}
+              
+            if ($add) {            
+              $data[] = $rec;
               $count++;
             }
           
@@ -441,7 +457,7 @@ function sugestio_user_execute($op, $account) {
 
 /**
  * Sends the node operation triggered by the hook to
- * the external Sugestio recommendation engine.
+ * the Sugestio recommendation engine.
  *
  * This method should NOT be called directly. All hook events
  * must pass through sugestio_hooks() to ensure correct cache
@@ -456,26 +472,37 @@ function sugestio_user_execute($op, $account) {
 function sugestio_node_execute($op, $node) {
   switch ($op) {
     case 'insert':
-    case 'update':
+    case 'update':      
+      
+      $client = sugestio_get_client();      
+      $sugestio_item = new SugestioItem(sugestio_anonymize($node->nid));      
+
+      // submitting a title and permalink avoids additional node_load operations 
+      // when visualizing recommendations       
+      $sugestio_item->title = $node->title;      
+      // use the alias as the permalink if one is set
+      if (!empty($node->path))
+        $path = $node->path;
+      else
+        $path = 'node/' . $node->nid;
+      
+      $sugestio_item->permalink = url($path, array('absolute' => TRUE));
 
       /* 
-       * Uncomment and complete the code below to submit item metadata
+       * Uncomment and complete the code below to submit more item metadata
+       * such as tags or categories
        * See http://www.sugestio.com/documentation for information on 
-       * what data you can send
+       * what data you can send and how it can be useful
        */
-      
-      // $client = sugestio_get_client();
-      // $sugestio_item = new SugestioItem(sugestio_anonymize($node->nid));      
       // $sugestio_item->from = '';
       // $sugestio_item->until = '';
       // $sugestio_item->location_simple = '';
       // $sugestio_item->location_latlong = '';
       // $sugestio_item->tag = array();
       // $sugestio_item->creator = array();
-      // $sugestio_item->category = array();
-      
-      // $result = $client->addItem($sugestio_item);
-      // return $result;
+      // $sugestio_item->category = array();      
+      $result = $client->addItem($sugestio_item);
+      return $result;
 
       break;
   }
@@ -627,8 +654,8 @@ function sugestio_build_content($arr, $type) {
 
   $data = array();
   
-  foreach ($arr as $node) {
-    if (is_object($node)) {
+  foreach ($arr as $rec) {
+    if (is_array($rec)) {
       if ($count >= $max_items) {
         break;
       }
@@ -639,7 +666,7 @@ function sugestio_build_content($arr, $type) {
         $sugestio_account = variable_get('sugestio_account', 'sandbox');
         $consumption_detail = $type; // indicate if the user clicked a personal recommendation or a similar item
         $userid = sugestio_anonymize($user->uid);
-        $itemid = sugestio_anonymize($node->nid);
+        $itemid = sugestio_anonymize($rec['itemid']);
         
         $onclick = "sugestio_clicked('$sugestio_url', '$sugestio_account', '{$userid}', '{$itemid}', 'VIEW', '$consumption_detail')";
         
@@ -650,7 +677,7 @@ function sugestio_build_content($arr, $type) {
         );
          
       }
-      $data[] = l($node->title, $node->path, $options);      
+      $data[] = l($rec['item']['title'], $rec['item']['permalink'], $options);      
       $count++;
     }
   }
