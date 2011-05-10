@@ -276,7 +276,7 @@ function sugestio_fetch_data($id, $category) {
       }
       //For item similarities (recommendations).
       elseif ($category == 'item') {
-        $recs = $client->getSimilar($id);
+        $recs = $client->getSimilarItems($id);
       }
       if (!empty($recs)) {
        
@@ -368,7 +368,7 @@ function sugestio_votingapi_update($vote, $new_value) {
  * Implementation of hook_votingapi_delete().
  */
 function sugestio_votingapi_delete($vote) {
-  //Is currently not supported in the external Sugestio recommendation engine.
+  // TODO
 }
 
 /**
@@ -535,8 +535,10 @@ function sugestio_vote_execute($op, $vote) {
       foreach ($vote as $v) {
         $userid = sugestio_anonymize($v['uid']);
         $itemid = sugestio_anonymize($v['content_id']);
+        $consumptionid = sugestio_anonymize($v['uid'] . '-' . $v['content_id']);
 
         $consumption = new SugestioConsumption($userid, $itemid);
+        $consumption->id = $consumptionid;
         $consumption->type = 'RATING';
       
         // normally, the user can submit a single rating for a node
@@ -553,8 +555,7 @@ function sugestio_vote_execute($op, $vote) {
         else {
           /*
            * Generic way of passing the ratings.
-           * Do try to map these on the specific API of the external
-           * Sugestio recommendation engine instead!
+           * Do try to map these on the Sugestio API
            * This is just a fallback method
            */
           $consumption->detail = $v['value_type'] . ':' . $v['value'];
@@ -568,8 +569,6 @@ function sugestio_vote_execute($op, $vote) {
       
         // if we failed to submit one of the votes, we return immediately and
         // all votes are queued in the cron system for a new attempt later
-        // some votes might be recorded multiple times, but sugestio can ignore
-        // duplicates (they all have the same uid, nid and timestamp)
         if ($res != 202)
           return $res;
           
